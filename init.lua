@@ -395,6 +395,9 @@ vim.diagnostic.config({
   },
 })
 
+vim.keymap.set("n", "<leader>d", function()
+  vim.diagnostic.open_float(0, { scope = "line" })
+end, { silent = true, desc = "Show diagnostics" })
 -- Define compact diagnostic symbols
 local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
 for type, icon in pairs(signs) do
