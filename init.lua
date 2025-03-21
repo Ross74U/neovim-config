@@ -161,7 +161,7 @@ require("lazy").setup({
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    config = function()
+   config = function()
       require("nvim-treesitter.configs").setup({
         ensure_installed = {
           "lua", "python", "c", "cpp", "javascript", "typescript", "html", "css", 
@@ -361,6 +361,7 @@ vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>", { silent = true, d
 vim.keymap.set("n", "<leader>fb", ":Telescope buffers<CR>", { silent = true, desc = "Find buffers" })
 vim.keymap.set("n", "<leader>fh", ":Telescope help_tags<CR>", { silent = true, desc = "Help tags" })
 vim.keymap.set("n", "<leader>fo", ":Telescope oldfiles<CR>", { silent = true, desc = "Recent files" })
+vim.keymap.set("n", "<leader>fr", ":Telescope resume<CR>", { silent = true, desc = "Recent files" })
 
 -- Window navigation
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
