@@ -356,11 +356,11 @@ vim.keymap.set("n", "<Tab>", ":BufferLineCycleNext<CR>", { silent = true, desc =
 vim.keymap.set("n", "<S-Tab>", ":BufferLineCyclePrev<CR>", { silent = true, desc = "Previous buffer" })
 
 -- Telescope
-vim.keymap.set("n", "<leader>ff", ":Telescope find_files<CR>", { silent = true, desc = "Find files" })
-vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>", { silent = true, desc = "Live grep" })
-vim.keymap.set("n", "<leader>fb", ":Telescope buffers<CR>", { silent = true, desc = "Find buffers" })
+vim.keymap.set("n", "<leader>ff", ":Telescope find_files hidden=true find_command=rg,--files,--hidden,--glob,!**/.git/*<CR>", { silent = true, desc = "Find files" })
+vim.keymap.set("n", "<leader>fg", ":Telescope live_grep hidden=true find_command=rg,--files,--hidden,--glob,!**/.git<CR>", { silent = true, desc = "Live grep" })
+vim.keymap.set("n", "<leader>fb", ":Telescope buffers hidden=true find_command=rg,--files,--hidden,--glob,!**/.git<CR>", { silent = true, desc = "Find buffers" })
 vim.keymap.set("n", "<leader>fh", ":Telescope help_tags<CR>", { silent = true, desc = "Help tags" })
-vim.keymap.set("n", "<leader>fo", ":Telescope oldfiles<CR>", { silent = true, desc = "Recent files" })
+vim.keymap.set("n", "<leader>fo", ":Telescope oldfiles hidden=true find_command=rg,--files,--hidden,--glob,!**/.git<CR>", { silent = true, desc = "Recent files" })
 vim.keymap.set("n", "<leader>fr", ":Telescope resume<CR>", { silent = true, desc = "Recent files" })
 
 -- Window navigation
@@ -379,6 +379,12 @@ vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { silent = true, des
 vim.keymap.set("n", "<leader>w", ":w<CR>", { silent = true, desc = "Save" })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { silent = true, desc = "Quit" })
 vim.keymap.set("n", "<Esc>", ":noh<CR>", { silent = true, desc = "Clear highlights" })
+
+-- Open current buffer in vertical and horizontal split
+vim.keymap.set('n', '<leader>vv', ':vsplit<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>hh', ':split<CR>', { noremap = true, silent = true })
+-- Convert all splits to tabs (each window becomes its own tab)
+vim.keymap.set('n', '<leader>tt', '<C-w>T', { noremap = true, silent = true })
 
 -- Configure LSP diagnostic appearance (minimal)
 vim.diagnostic.config({
