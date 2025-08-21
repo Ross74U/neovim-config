@@ -50,15 +50,15 @@ return {
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
-          { name = "luasnip" },
           { name = "buffer" },
+          { name = "luasnip" },
           { name = "path" },
         }),
         formatting = {
           format = function(entry, vim_item)
             vim_item.menu = ({
               nvim_lsp = "[LSP]",
-              luasnip = "[Snippet]",
+              luasnip = "[Luasnip]",
               buffer = "[Buffer]",
               path = "[Path]",
             })[entry.source.name]

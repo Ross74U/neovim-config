@@ -3,6 +3,7 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 -- Basic settings
+vim.opt.colorcolumn = "81"        -- Color column
 vim.opt.number = true             -- Show line numbers
 vim.opt.relativenumber = true     -- Show relative line numbers
 vim.opt.termguicolors = true      -- Enable 24-bit RGB colors
@@ -17,7 +18,7 @@ vim.opt.clipboard = "unnamedplus" -- Use system clipboard
 vim.opt.splitbelow = true         -- Split below by default
 vim.opt.splitright = true         -- Split right by default
 vim.opt.showmode = false          -- Don't show mode in command line
-vim.opt.scrolloff = 8             -- Start scrolling when 8 lines from edge
+vim.opt.scrolloff = 4             -- Start scrolling when 8 lines from edge
 vim.opt.updatetime = 300          -- Faster completion
 
 -- Configure LSP diagnostic appearance (minimal)

@@ -23,29 +23,45 @@ vim.keymap.set("n", "<leader>fo", ":Telescope oldfiles hidden=true find_command=
 vim.keymap.set("n", "<leader>fr", ":Telescope resume<CR>", { silent = true, desc = "Recent files" })
 
 -- Window navigation
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to bottom window" })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+vim.keymap.set("n", "<C-h>", ":TmuxNavigateLeft<CR>", { silent = true, desc = "Move to left window" })
+vim.keymap.set("n", "<C-j>", ":TmuxNavigateDown<CR>", { silent = true, desc = "Move to bottom window" })
+vim.keymap.set("n", "<C-k>", ":TmuxNavigateUp<CR>", { silent = true, desc = "Move to top window" })
+vim.keymap.set("n", "<C-l>", ":TmuxNavigateRight<CR>", { silent = true, desc = "Move to right window" })
 
 -- Resize windows
-vim.keymap.set("n", "<C-Up>", ":resize +2<CR>", { silent = true, desc = "Increase window height" })
-vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { silent = true, desc = "Decrease window height" })
-vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { silent = true, desc = "Decrease window width" })
-vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { silent = true, desc = "Increase window width" })
+vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<CR><C-w>=", { silent = true, desc = "Increase window height" })
+vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<CR><C-w>=", { silent = true, desc = "Decrease window height" })
+vim.keymap.set("n", "<M-h>", "<cmd>vertical resize -2<CR>", { silent = true, desc = "Decrease window width" })
+vim.keymap.set("n", "<M-l>", "<cmd>vertical resize +2<CR>", { silent = true, desc = "Increase window width" })
 
--- Other useful mappings
+-- Otheir useful mappings
 vim.keymap.set("n", "<leader>w", ":w<CR>", { silent = true, desc = "Save" })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { silent = true, desc = "Quit" })
 vim.keymap.set("n", "<Esc>", ":noh<CR>", { silent = true, desc = "Clear highlights" })
+vim.keymap.set('i', 'jk', '<Esc>', { noremap = true, silent = true })
+vim.keymap.set('n', '<M-j>', '10jzz', { noremap = true, silent = true })
+vim.keymap.set('n', '<M-k>', '10kzz', { noremap = true, silent = true })
 
 -- Open current buffer in vertical and horizontal split
 vim.keymap.set('n', '<leader>vv', ':vsplit<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>hh', ':split<CR>', { noremap = true, silent = true })
--- Convert all splits to tabs (each window becomes its own tab)
+-- Convert all splits to tabs
 vim.keymap.set('n', '<leader>tt', '<C-w>T', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>cc', '<C-w>c', { noremap = true, silent = true, desc = "Close current split" })
 
 -- LSP diagnostics
 vim.keymap.set("n", "<leader>d", function()
   vim.diagnostic.open_float(0, { scope = "line" })
 end, { silent = true, desc = "Show diagnostics" })
+
+-- Toggle diagnostics on and off
+vim.keymap.set('n', '<leader>td', function()
+  local current_state = vim.diagnostic.is_disabled()
+  if current_state then
+    vim.diagnostic.enable()
+    vim.notify("Diagnostics enabled", vim.log.levels.INFO)
+  else
+    vim.diagnostic.disable()
+    vim.notify("Diagnostics disabled", vim.log.levels.INFO)
+  end
+end, { desc = "Toggle diagnostics" })

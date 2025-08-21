@@ -116,21 +116,22 @@ return {
       -- Special setup for Rust with rust-tools
       require("rust-tools").setup({
         tools = {
+          hover_actions = { auto_focus = true },
           inlay_hints = {
-            auto = true,
-            show_parameter_hints = true,
-          },
-          hover_actions = {
-            auto_focus = true,
+            auto = false,
+            show_parameter_hints = false,
+            only_current_line = false,
+            -- force-clear any virtual text
+            enabled = false,
           },
         },
         server = {
           capabilities = capabilities,
           on_attach = function(client, bufnr)
             -- Enable inlay hints
-            if client.server_capabilities.inlayHintProvider then
-              vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-            end
+            -- if client.server_capabilities.inlayHintProvider then
+            --  vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+            --end
 
             -- Make sure formatting is enabled
             client.server_capabilities.documentFormattingProvider = true
@@ -175,7 +176,6 @@ return {
               },
               diagnostics = {
                 enable = true,
-                enableExperimental = true,
               },
               check = {
                 command = "clippy",
@@ -186,11 +186,12 @@ return {
                 importPrefix = "self",
               },
               inlayHints = {
+                enable = false,
                 lifetimeElisionHints = {
-                  enable = "always",
+                  enable = "never",
                 },
                 reborrowHints = {
-                  enable = "always",
+                  enable = "never",
                 },
               },
             }
@@ -212,7 +213,6 @@ return {
         sources = {
           null_ls.builtins.formatting.stylua,
           null_ls.builtins.formatting.prettier,
-          -- Removed rustfmt to avoid issues
         },
       })
 
