@@ -13,9 +13,9 @@ return {
         dim_inactive_windows = false,
         extend_background_behind_borders = true,
         styles = {
-          bold = false,
+          bold = true,
           italic = true,
-          transparency = false,
+          transparency = true,
         },
       })
       vim.cmd("colorscheme rose-pine")

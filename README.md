@@ -11,12 +11,15 @@
 - `<Tab>` - Next buffer
 - `<S-Tab>` - Previous buffer
 - `<leader>x` - Close buffer
+- `<leader>cc` - unsplit current buffer
+- `<leader>vv` - split vertical
+- `<leader>hh` - split horizontal
 
 ## File Explorer (NvimTree)
 - `<leader>e` - Toggle NvimTree
 - `<leader>o` - Focus NvimTree
 
-## Telescope Fuzzy Finder
+## Telescope
 - `<leader>ff` - Find files
 - `<leader>fg` - Live grep (search text)
 - `<leader>fb` - Find buffers
@@ -30,12 +33,14 @@
 - `<leader>rn` - Rename Symbol
 - `<leader>ca` - Code Action
 - `<leader>d` - Show diagnostics
+- `<leader>rr` - rust runnables
+- `<leader>td` - toggle lsp diagnostics
 
 ## Window Management
-- `<C-Up>` - Increase window height
-- `<C-Down>` - Decrease window height
-- `<C-Left>` - Decrease window width
-- `<C-Right>` - Increase window width
+- `<A-Up>` - Increase window height
+- `<A-Down>` - Decrease window height
+- `<A-Left>` - Decrease window width
+- `<A-Right>` - Increase window width
 
 ## Autocompletion
 - `<C-Space>` - Complete
@@ -43,9 +48,4 @@
 - `<CR>` - Confirm selection
 - `<Tab>` - Next item/expand snippet
 - `<S-Tab>` - Previous item
-
-## General
-- `<leader>w` - Save file
-- `<leader>q` - Quit
-- `<Esc>` - Clear search highlights
 
