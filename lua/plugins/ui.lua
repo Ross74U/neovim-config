@@ -1,53 +1,32 @@
 -- UI related plugins
 return {
-  -- Rose Pine with persistent black background
+  -- Bufferline for tab management
   {
     "rose-pine/neovim",
     name = "rose-pine",
     lazy = false,
     priority = 1000,
     config = function()
-      -- First load Rose Pine with default settings
       require("rose-pine").setup({
-        variant = "main",
+        variant = "main", -- auto, main, moon, or dawn
+        dark_variant = "main",
+        dim_inactive_windows = false,
+        extend_background_behind_borders = true,
+        styles = {
+          bold = true,
+          italic = true,
+          transparency = true,
+        },
       })
-      -- Set the colorscheme
       vim.cmd("colorscheme rose-pine")
-      -- Override backgrounds to black for both active and inactive windows
-      vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
-      vim.api.nvim_set_hl(0, "NormalNC", { bg = "#000000" })         -- Non-current windows
-      vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#000000" })
-      vim.api.nvim_set_hl(0, "NvimTreeNormal", { bg = "#000000" })   -- NvimTree background
-      vim.api.nvim_set_hl(0, "NvimTreeNormalNC", { bg = "#000000" }) -- NvimTree inactive
-      -- Set background for file explorer specifically
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "NvimTree",
-        callback = function()
-          vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
-          vim.api.nvim_set_hl(0, "NormalNC", { bg = "#000000" })
-        end
-      })
-      -- Keep background black when switching buffers
-      vim.api.nvim_create_autocmd("WinEnter", {
-        callback = function()
-          vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
-          vim.api.nvim_set_hl(0, "NormalNC", { bg = "#000000" })
-        end
-      })
-      vim.opt.background = "dark"
+
+      -- Override background to black
+      vim.cmd("highlight Normal guibg=#000000")
+      vim.cmd("highlight NormalNC guibg=#000000")
+      vim.cmd("highlight SignColumn guibg=#000000")
+      vim.cmd("highlight EndOfBuffer guibg=#000000")
     end,
   },
-
-  -- Status line
-  {
-    "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-      require("lualine").setup({})
-    end,
-  },
-
-  -- Bufferline for tab management
   {
     "akinsho/bufferline.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -57,9 +36,23 @@ return {
           mode = "buffers",
           separator_style = "thin",
           always_show_bufferline = true,
-          show_buffer_close_icons = true,
+          show_buffer_close_icons = false,
           show_close_icon = false,
           color_icons = true,
+        },
+        highlights = {
+          background = {
+            bg = "#000000",
+          },
+          buffer_selected = {
+            bg = "#000000",
+          },
+          buffer_visible = {
+            bg = "#000000",
+          },
+          fill = {
+            bg = "#000000",
+          },
         },
       })
     end,

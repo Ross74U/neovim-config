@@ -1,5 +1,10 @@
 -- Editor enhancement plugins
 return {
+  -- Tmux pane navigation integration
+  {
+    "christoomey/vim-tmux-navigator",
+    lazy = false,
+  },
   -- NvimTree file explorer
   {
     "nvim-tree/nvim-tree.lua",
@@ -8,11 +13,12 @@ return {
     },
     config = function()
       require("nvim-tree").setup({
+        open_on_tab = false,
         disable_netrw = true,
-        hijack_netrw = true,
         respect_buf_cwd = true,
         view = {
-          width = 40,
+          side = "right",
+          width = 30,
         },
         renderer = {
           group_empty = true,
