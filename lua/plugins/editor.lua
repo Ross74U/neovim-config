@@ -5,6 +5,7 @@ return {
     "christoomey/vim-tmux-navigator",
     lazy = false,
   },
+
   -- NvimTree file explorer
   {
     "nvim-tree/nvim-tree.lua",
@@ -18,7 +19,7 @@ return {
         respect_buf_cwd = true,
         view = {
           side = "right",
-          width = 30,
+          width = 40,
         },
         renderer = {
           group_empty = true,

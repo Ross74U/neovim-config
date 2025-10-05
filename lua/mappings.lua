@@ -6,8 +6,6 @@ vim.keymap.set("n", "<leader>o", ":NvimTreeFocus<CR>", { silent = true, desc = "
 
 -- Buffer navigation
 vim.keymap.set("n", "<leader>x", ":bdelete<CR>", { silent = true, desc = "Close buffer" })
-vim.keymap.set("n", "<Tab>", ":BufferLineCycleNext<CR>", { silent = true, desc = "Next buffer" })
-vim.keymap.set("n", "<S-Tab>", ":BufferLineCyclePrev<CR>", { silent = true, desc = "Previous buffer" })
 
 -- Telescope
 vim.keymap.set("n", "<leader>ff",
@@ -34,13 +32,11 @@ vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<CR><C-w>=", { silent = true, des
 vim.keymap.set("n", "<M-h>", "<cmd>vertical resize -2<CR>", { silent = true, desc = "Decrease window width" })
 vim.keymap.set("n", "<M-l>", "<cmd>vertical resize +2<CR>", { silent = true, desc = "Increase window width" })
 
--- Otheir useful mappings
-vim.keymap.set("n", "<leader>w", ":w<CR>", { silent = true, desc = "Save" })
-vim.keymap.set("n", "<leader>q", ":q<CR>", { silent = true, desc = "Quit" })
+-- Other useful mappings
 vim.keymap.set("n", "<Esc>", ":noh<CR>", { silent = true, desc = "Clear highlights" })
 vim.keymap.set('i', 'jk', '<Esc>', { noremap = true, silent = true })
-vim.keymap.set('n', '<M-j>', '10jzz', { noremap = true, silent = true })
-vim.keymap.set('n', '<M-k>', '10kzz', { noremap = true, silent = true })
+vim.keymap.set('n', '<M-j>', '10j', { noremap = true, silent = true })
+vim.keymap.set('n', '<M-k>', '10k', { noremap = true, silent = true })
 
 -- Open current buffer in vertical and horizontal split
 vim.keymap.set('n', '<leader>vv', ':vsplit<CR>', { noremap = true, silent = true })
