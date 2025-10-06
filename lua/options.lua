@@ -36,3 +36,7 @@ vim.diagnostic.config({
     source = "always",
   },
 })
+
+-- status line initial empty value to ensure it is drawn even if hotbuffers isn't loaded properly
+vim.o.laststatus = 3   -- always show a statusline
+vim.o.statusline = " " -- ensure it's never empty

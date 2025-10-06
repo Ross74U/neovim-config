@@ -1,4 +1,3 @@
--- lua/hotbuffers.lua
 local M = {}
 
 -- SETTINGS ---------------------------------------------------------
@@ -47,11 +46,11 @@ function M.add_current()
   for i = 1, M.max_hot do
     if not M.hotbufs[i] then
       M.hotbufs[i] = { bufnr = current }
-      vim.notify(string.format("Added to hot slot %d: %s", i, shortname(current)))
-      M.refresh_statusline()
       return
     end
   end
+
+  M.refresh_statusline()
 end
 
 --------------------------------------------------------------------
@@ -59,7 +58,6 @@ end
 --------------------------------------------------------------------
 function M.add_current_to(n)
   if type(n) ~= "number" or n < 1 or n > M.max_hot then
-    vim.notify("Invalid hot buffer slot: " .. tostring(n), vim.log.levels.ERROR)
     return
   end
 
@@ -77,6 +75,39 @@ function M.add_current_to(n)
   M.refresh_statusline()
 end
 
+function M.swap_current_with(n)
+  if type(n) ~= "number" or n < 1 or n > M.max_hot then
+    return
+  end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  local target_slot = M.hotbufs[n]
+
+  local prev_slot_num = nil;
+  for i = 1, M.max_hot do
+    if M.hotbufs[i] and M.hotbufs[i].bufnr == bufnr then
+      M.hotbufs[i] = nil
+      prev_slot_num = i
+    end
+  end
+
+  if target_slot then
+    if prev_slot_num then
+      M.hotbufs[prev_slot_num] = { bufnr = target_slot.bufnr }
+    else
+      for i = 1, M.max_hot do
+        if not M.hotbufs[i] then
+          M.hotbufs[i] = { bufnr = target_slot.bufnr }
+          return
+        end
+      end
+    end
+  end
+
+  M.hotbufs[n] = { bufnr = bufnr }
+  M.refresh_statusline()
+end
+
 --------------------------------------------------------------------
 -- Jump to Nth hot buffer
 --------------------------------------------------------------------
@@ -89,11 +120,25 @@ function M.goto_hot(n)
 end
 
 --------------------------------------------------------------------
--- Dehot Current Buffer
+-- Dehot Buffer
 --------------------------------------------------------------------
 function M.dehot(n)
   cleanup()
   M.hotbufs[n] = nil
+  M.refresh_statusline()
+end
+
+--------------------------------------------------------------------
+-- Dehot Current Buffer
+--------------------------------------------------------------------
+function M.dehot_current()
+  cleanup()
+  local bufnr = vim.api.nvim_get_current_buf()
+  for i, slot in ipairs(M.hotbufs) do
+    if slot.bufnr == bufnr then
+      M.hotbufs[i] = nil
+    end
+  end
   M.refresh_statusline()
 end
 
@@ -131,11 +176,11 @@ function M.statusline()
   local parts = {}
   for i = 1, M.max_hot do
     local slot = M.hotbufs[i]
+    local hl = slot and (slot.bufnr == vim.api.nvim_get_current_buf()) and "%#PmenuSel#" or "%#StatusLine#"
     if slot and slot.bufnr and vim.api.nvim_buf_is_valid(slot.bufnr) then
-      local hl = (slot.bufnr == vim.api.nvim_get_current_buf()) and "%#PmenuSel#" or "%#StatusLine#"
       table.insert(parts, string.format("%s[%d:%s]", hl, i, shortname(slot.bufnr)))
     else
-      table.insert(parts, string.format("[ %d:— ]", i))
+      table.insert(parts, string.format("%s[ %d:— ]", hl, i))
     end
   end
   return table.concat(parts, " ")
@@ -155,7 +200,7 @@ function M.setup()
     end, { desc = "Go to hot buffer " .. i })
 
     vim.keymap.set("n", string.format("<M-h>%d", i), function()
-      M.add_current_to(i)
+      M.swap_current_with(i)
     end, { desc = "Assign current buffer to hot slot " .. i })
 
     vim.keymap.set("n", string.format("<M-x>%d", i), function()
@@ -164,6 +209,7 @@ function M.setup()
   end
 
   vim.keymap.set("n", "<M-h>a", M.add_current, { desc = "Add current buffer to next free hot slot" })
+  vim.keymap.set("n", "<M-h>x", M.dehot_current, { desc = "Dehot current buffer" })
 
   vim.keymap.set("n", "<leader>hx", M.close_non_hot_buffers, { desc = "Close all non-hot buffers" })
 
