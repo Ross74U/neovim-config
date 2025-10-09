@@ -209,11 +209,16 @@ function M.setup()
   end
 
   vim.keymap.set("n", "<M-h>a", M.add_current, { desc = "Add current buffer to next free hot slot" })
-  vim.keymap.set("n", "<M-h>x", M.dehot_current, { desc = "Dehot current buffer" })
+  vim.keymap.set("n", "<leader>hc", M.dehot_current, { desc = "Dehot current buffer" })
 
   vim.keymap.set("n", "<leader>hx", M.close_non_hot_buffers, { desc = "Close all non-hot buffers" })
 
-  vim.api.nvim_create_autocmd("BufDelete", { callback = cleanup })
+  vim.api.nvim_create_autocmd("BufWipeout", {
+    callback = function()
+      vim.notify("buffer wipeout")
+      cleanup()
+    end
+  })
 
   vim.api.nvim_create_autocmd("BufWinEnter", {
     callback = function()
