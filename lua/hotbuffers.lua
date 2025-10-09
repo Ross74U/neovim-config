@@ -1,12 +1,6 @@
 local M = {}
-
--- SETTINGS ---------------------------------------------------------
-M.max_hot = 5  -- total slots
-M.hotbufs = {} -- fixed-size list (nil or { bufnr = num })
-for i = 1, M.max_hot do
-  M.hotbufs[i] = nil
-end
-
+M.hotkeys = { "1", "2", "3", "4", "5" }
+M.hotbufs = {}
 --------------------------------------------------------------------
 -- Utilities
 --------------------------------------------------------------------
@@ -16,12 +10,22 @@ local function shortname(bufnr)
   return (name == "" and "[No Name]") or name
 end
 
--- remove invalid buffers from slots
 local function cleanup()
-  for i = 1, M.max_hot do
-    local slot = M.hotbufs[i]
-    if slot and (not vim.api.nvim_buf_is_valid(slot.bufnr)) then
-      M.hotbufs[i] = nil
+  for _, key in pairs(M.hotkeys) do
+    local bufnr = M.hotbufs[key]
+    if bufnr and (not vim.api.nvim_buf_is_valid(bufnr)) then
+      M.hotbufs[key] = nil
+    end
+  end
+end
+
+local function is_hotkeys(key)
+  if type(key) ~= "string" then
+    return false
+  end
+  for _, hotkey in pairs(M.hotkeys) do
+    if hotkey == key then
+      return true
     end
   end
 end
@@ -30,22 +34,19 @@ end
 -- Add current buffer to next available slot
 --------------------------------------------------------------------
 function M.add_current()
-  cleanup()
-  local current = vim.api.nvim_get_current_buf()
+  local current_bufnr = vim.api.nvim_get_current_buf()
 
   -- skip if already hot
-  for i = 1, M.max_hot do
-    local slot = M.hotbufs[i]
-    if slot and slot.bufnr == current then
-      vim.notify("Buffer already marked hot")
+  for _, bufnr in pairs(M.hotbufs) do
+    if bufnr == current_bufnr then
       return
     end
   end
 
   -- find a free slot
-  for i = 1, M.max_hot do
-    if not M.hotbufs[i] then
-      M.hotbufs[i] = { bufnr = current }
+  for _, key in pairs(M.hotkeys) do
+    if not M.hotbufs[key] then
+      M.hotbufs[key] = current_bufnr
       return
     end
   end
@@ -56,75 +57,66 @@ end
 --------------------------------------------------------------------
 -- Add current buffer to specific slot n (replace if needed)
 --------------------------------------------------------------------
-function M.add_current_to(n)
-  if type(n) ~= "number" or n < 1 or n > M.max_hot then
+function M.add_current_to(key)
+  if not is_hotkeys(key) then
     return
+    -- TODO: add additional hotkeys behavior here
   end
 
   local bufnr = vim.api.nvim_get_current_buf()
 
   -- remove duplicates
-  for i = 1, M.max_hot do
-    if M.hotbufs[i] and M.hotbufs[i].bufnr == bufnr then
-      M.hotbufs[i] = nil
+  for hotkey, assigned_bufnr in pairs(M.hotbufs) do
+    if assigned_bufnr == bufnr then
+      M.hotbufs[hotkey] = nil
     end
   end
 
-  M.hotbufs[n] = { bufnr = bufnr }
-  vim.notify(string.format("Set slot %d → %s", n, shortname(bufnr)))
+  M.hotbufs[key] = bufnr
+  vim.notify(string.format("Set key %s → %s", key, shortname(bufnr)))
   M.refresh_statusline()
 end
 
-function M.swap_current_with(n)
-  if type(n) ~= "number" or n < 1 or n > M.max_hot then
+function M.swap_current_with(target_key)
+  if not is_hotkeys(target_key) then
     return
   end
 
-  local bufnr = vim.api.nvim_get_current_buf()
-  local target_slot = M.hotbufs[n]
+  local current_bufnr = vim.api.nvim_get_current_buf()
+  local target_bufnr = M.hotbufs[target_key]
 
-  local prev_slot_num = nil;
-  for i = 1, M.max_hot do
-    if M.hotbufs[i] and M.hotbufs[i].bufnr == bufnr then
-      M.hotbufs[i] = nil
-      prev_slot_num = i
+  local current_key = nil;
+  for key, bufnr in pairs(M.hotbufs) do
+    if bufnr == current_bufnr then
+      current_key = key
+      M.hotbufs[key] = nil
     end
   end
 
-  if target_slot then
-    if prev_slot_num then
-      M.hotbufs[prev_slot_num] = { bufnr = target_slot.bufnr }
-    else
-      for i = 1, M.max_hot do
-        if not M.hotbufs[i] then
-          M.hotbufs[i] = { bufnr = target_slot.bufnr }
-          return
-        end
-      end
-    end
+  if target_bufnr and current_key then
+    M.hotbufs[current_key] = target_bufnr
   end
+  M.hotbufs[target_key] = current_bufnr
 
-  M.hotbufs[n] = { bufnr = bufnr }
   M.refresh_statusline()
 end
 
 --------------------------------------------------------------------
 -- Jump to Nth hot buffer
 --------------------------------------------------------------------
-function M.goto_hot(n)
-  cleanup()
-  local slot = M.hotbufs[n]
-  if slot and slot.bufnr and vim.api.nvim_buf_is_valid(slot.bufnr) then
-    vim.api.nvim_set_current_buf(slot.bufnr)
+function M.goto_hot(key)
+  local bufnr = M.hotbufs[key]
+  if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
+    vim.api.nvim_set_current_buf(bufnr)
   end
+  M.refresh_statusline()
 end
 
 --------------------------------------------------------------------
 -- Dehot Buffer
 --------------------------------------------------------------------
-function M.dehot(n)
-  cleanup()
-  M.hotbufs[n] = nil
+function M.dehot(key)
+  M.hotbufs[key] = nil
   M.refresh_statusline()
 end
 
@@ -133,10 +125,10 @@ end
 --------------------------------------------------------------------
 function M.dehot_current()
   cleanup()
-  local bufnr = vim.api.nvim_get_current_buf()
-  for i, slot in ipairs(M.hotbufs) do
-    if slot.bufnr == bufnr then
-      M.hotbufs[i] = nil
+  local current_bufnr = vim.api.nvim_get_current_buf()
+  for key, bufnr in pairs(M.hotbufs) do
+    if current_bufnr == bufnr then
+      M.hotbufs[key] = nil
     end
   end
   M.refresh_statusline()
@@ -147,9 +139,9 @@ end
 --------------------------------------------------------------------
 function M.close_non_hot_buffers()
   local hot_set = {}
-  for _, slot in ipairs(M.hotbufs) do
-    if slot and slot.bufnr and vim.api.nvim_buf_is_valid(slot.bufnr) then
-      hot_set[slot.bufnr] = true
+  for _, bufnr in pairs(M.hotbufs) do
+    if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
+      hot_set[bufnr] = true
     end
   end
 
@@ -174,16 +166,16 @@ end
 function M.statusline()
   cleanup()
   local parts = {}
-  for i = 1, M.max_hot do
-    local slot = M.hotbufs[i]
-    local hl = slot and (slot.bufnr == vim.api.nvim_get_current_buf()) and "%#PmenuSel#" or "%#StatusLine#"
-    if slot and slot.bufnr and vim.api.nvim_buf_is_valid(slot.bufnr) then
-      table.insert(parts, string.format("%s[%d:%s]", hl, i, shortname(slot.bufnr)))
+  for _, key in pairs(M.hotkeys) do
+    local bufnr = M.hotbufs[key]
+    local hl = key and (bufnr == vim.api.nvim_get_current_buf()) and "%#PmenuSel#" or "%#StatusLine#"
+    if bufnr then
+      table.insert(parts, string.format("%s[%s:%s]", hl, key, shortname(bufnr)))
     else
-      table.insert(parts, string.format("%s[ %d:— ]", hl, i))
+      table.insert(parts, string.format("%s[ %s:— ]", hl, key))
     end
   end
-  return table.concat(parts, " ")
+  return table.concat(parts, "       ")
 end
 
 function M.refresh_statusline()
@@ -193,29 +185,27 @@ end
 --------------------------------------------------------------------
 -- Setup / Keymaps
 --------------------------------------------------------------------
-function M.setup()
-  for i = 1, M.max_hot do
-    vim.keymap.set("n", string.format("<M-%d>", i), function()
-      M.goto_hot(i)
-    end, { desc = "Go to hot buffer " .. i })
+function M.setup(hotkeys)
+  if hotkeys then
+    M.hotkeys = hotkeys
+  end
 
-    vim.keymap.set("n", string.format("<M-h>%d", i), function()
-      M.swap_current_with(i)
-    end, { desc = "Assign current buffer to hot slot " .. i })
+  for _, key in pairs(M.hotkeys) do
+    vim.keymap.set("n", string.format("<M-%s>", key), function()
+      M.goto_hot(key)
+    end, { desc = "Go to hot buffer " .. key })
 
-    vim.keymap.set("n", string.format("<M-x>%d", i), function()
-      M.dehot(i)
-    end, { desc = "Assign current buffer to hot slot " .. i })
+    vim.keymap.set("n", string.format("<M-h>%s", key), function()
+      M.swap_current_with(key)
+    end, { desc = "Assign current buffer to hot slot " .. key })
   end
 
   vim.keymap.set("n", "<M-h>a", M.add_current, { desc = "Add current buffer to next free hot slot" })
-  vim.keymap.set("n", "<leader>hc", M.dehot_current, { desc = "Dehot current buffer" })
-
+  vim.keymap.set("n", "<M-x>", M.dehot_current, { desc = "Dehot current buffer" })
   vim.keymap.set("n", "<leader>hx", M.close_non_hot_buffers, { desc = "Close all non-hot buffers" })
 
   vim.api.nvim_create_autocmd("BufWipeout", {
     callback = function()
-      vim.notify("buffer wipeout")
       cleanup()
     end
   })
@@ -227,6 +217,7 @@ function M.setup()
       require("hotbuffers").add_current()
     end,
   })
+
   M.refresh_statusline()
 end
 

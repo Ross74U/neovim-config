@@ -18,9 +18,5 @@ require("options")
 require("lazy").setup("plugins")
 require("mappings")
 
--- plugin/hotbuffers.lua
-pcall(
-  function()
-    require("hotbuffers").setup()
-  end
-)
+-- /hotbuffers.lua
+require("hotbuffers").setup({ "1", "2", "3", "9", "0" })
