@@ -5,7 +5,7 @@ vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { silent = true, desc = 
 vim.keymap.set("n", "<leader>o", ":NvimTreeFocus<CR>", { silent = true, desc = "Focus NvimTree" })
 
 -- Buffer navigation
-vim.keymap.set("n", "<leader>x", ":bdelete<CR>", { silent = true, desc = "Close buffer" })
+vim.keymap.set("n", "<leader>x", ":bwipeout<CR>", { silent = true, desc = "Close buffer" })
 
 -- Telescope
 vim.keymap.set("n", "<leader>ff",
