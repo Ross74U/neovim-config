@@ -3,7 +3,17 @@
 local map = vim.keymap.set
 map("n", "K", vim.lsp.buf.hover)
 map("n", "gd", vim.lsp.buf.definition)
-map("n", "gr", vim.lsp.buf.references)
+-- async for slow ref chasing
+map("n", "gr", function()
+  vim.lsp.buf_request(0, "textDocument/references", vim.lsp.util.make_position_params(), function(_, result)
+    if not result or vim.tbl_isempty(result) then
+      vim.notify("No references found")
+      return
+    end
+    vim.lsp.util.set_qflist(vim.lsp.util.locations_to_items(result))
+    vim.cmd("copen")
+  end)
+end, { desc = "Async LSP references" })
 map("n", "<leader>rn", vim.lsp.buf.rename)
 map("n", "<leader>ca", vim.lsp.buf.code_action)
 
@@ -42,8 +52,6 @@ vim.lsp.config("pyright", {
     },
   },
 })
-
--- Enable pyright for matching buffers
 vim.lsp.enable("pyright")
 
 -- rust_analyzer
@@ -52,24 +60,53 @@ vim.lsp.config("rust_analyzer", {
   cmd = { "/home/ross/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rust-analyzer" },
   filetypes = { "rust" },
   root_markers = { "Cargo.toml", ".git" },
+  flags = { debounce_text_changes = 150 },
   settings = {
     ["rust-analyzer"] = {
-      cargo = { allFeatures = true },
-      check = {
-        command = "clippy", -- ✅ new form
-        allTargets = true,
+      cargo = {
+        allFeatures = true,
+        loadOutDirsFromCheck = false,
+        runBuildScripts = false,
       },
       diagnostics = { enable = true },
+      check = {
+        command = "clippy",
+        allTargets = true,
+      },
+      files = {
+        excludeDirs = {
+          "target",
+          "examples",
+          "benches",
+          "tests",
+        },
+      },
+      workspace = {
+        workspaceFolders = { vim.fn.getcwd() },
+      },
     },
   },
   capabilities = capabilities,
 })
-
--- Enable the server for matching buffers automatically
 vim.lsp.enable("rust_analyzer")
 
+-- this must run after Neovim's built-in LSP is loaded
+vim.lsp.config("tsserver", { -- name: must be a plain string
+  cmd = { "typescript-language-server", "--stdio" },
+  filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+  root_markers = { "tsconfig.json", "package.json", ".git" },
+  settings = {
+    typescript = { suggest = { autoImports = true } },
+    javascript = { suggest = { autoImports = true } },
+  },
+  capabilities = capabilities
+})
+
+-- start or attach to a tsserver instance for the current buffer
+vim.lsp.enable("tsserver")
+
 -- Simpler servers
-for _, lsp in ipairs({ "tsserver", "html", "cssls", "jsonls" }) do
+for _, lsp in ipairs({ "html", "cssls", "jsonls" }) do
   vim.lsp.config(lsp, { capabilities = capabilities })
 end
 
