@@ -26,12 +26,6 @@ vim.keymap.set("n", "<C-j>", ":TmuxNavigateDown<CR>", { silent = true, desc = "M
 vim.keymap.set("n", "<C-k>", ":TmuxNavigateUp<CR>", { silent = true, desc = "Move to top window" })
 vim.keymap.set("n", "<C-l>", ":TmuxNavigateRight<CR>", { silent = true, desc = "Move to right window" })
 
--- Resize windows
-vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<CR><C-w>=", { silent = true, desc = "Increase window height" })
-vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<CR><C-w>=", { silent = true, desc = "Decrease window height" })
-vim.keymap.set("n", "<M-h>", "<cmd>vertical resize -2<CR>", { silent = true, desc = "Decrease window width" })
-vim.keymap.set("n", "<M-l>", "<cmd>vertical resize +2<CR>", { silent = true, desc = "Increase window width" })
-
 -- Other useful mappings
 vim.keymap.set("n", "<Esc>", ":noh<CR>", { silent = true, desc = "Clear highlights" })
 vim.keymap.set('i', 'jk', '<Esc>', { noremap = true, silent = true })

@@ -17,6 +17,7 @@ vim.opt.rtp:prepend(lazypath)
 require("options")
 require("lazy").setup("plugins")
 require("mappings")
+require("lsp_configs")
 
 -- /hotbuffers.lua
-require("hotbuffers").setup({ "1", "2", "3", "9", "0" })
+require("hotbuffers.init").setup({ "1", "2", "3", "8", "9", "0" })
