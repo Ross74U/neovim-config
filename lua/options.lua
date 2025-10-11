@@ -19,7 +19,7 @@ vim.opt.splitbelow = true         -- Split below by default
 vim.opt.splitright = true         -- Split right by default
 vim.opt.showmode = false          -- Don't show mode in command line
 vim.opt.scrolloff = 4             -- Start scrolling when 8 lines from edge
-vim.opt.updatetime = 300          -- Faster completion
+vim.opt.signcolumn = "yes"
 
 -- Configure LSP diagnostic appearance (minimal)
 vim.diagnostic.config({

@@ -2,6 +2,7 @@ local M = {}
 
 local hotbuffers = require("hotbuffers.hotbuffers")
 local statusline = require("hotbuffers.statusline")
+local cursors = require("hotbuffers.cursors")
 --------------------------------------------------------------------
 -- Setup / Keymaps
 --------------------------------------------------------------------
@@ -20,9 +21,15 @@ function M.setup(hotkeys)
     end, { desc = "Assign current buffer to hot slot " .. key })
   end
 
+
+  vim.fn.sign_define("SavedCursor", { text = "C", texthl = "CurSearch" })
   vim.keymap.set("n", "<M-h>a", hotbuffers.add_current, { desc = "Add current buffer to next free hot slot" })
   vim.keymap.set("n", "<M-x>", hotbuffers.dehot_current, { desc = "Dehot current buffer" })
   vim.keymap.set("n", "<leader>hx", hotbuffers.close_non_hot_buffers, { desc = "Close all non-hot buffers" })
+  vim.keymap.set("n", "<M-l>", cursors.toggle_current_cursor, { desc = "Save cursor" })
+  vim.keymap.set("n", "<M-j>", cursors.cursor_next, { desc = "goto prev cursor" })
+  vim.keymap.set("n", "<M-k>", cursors.cursor_prev, { desc = "goto next cursor " })
+  vim.keymap.set("n", "<leader>lx", cursors.clear_cursors, { desc = "Clear all saved cursors in current buffer" })
 
   vim.api.nvim_create_autocmd("BufWipeout", {
     callback = function()

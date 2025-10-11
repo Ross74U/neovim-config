@@ -18,8 +18,7 @@ return {
           { name = "nvim_lsp", priority = 1000 },
           { name = "buffer",   keyword_length = 3 },
         },
-        preselect = cmp.PreselectMode.None,
-        experimental = { ghost_text = false },
+        experimental = { ghost_text = true },
       })
     end,
   },

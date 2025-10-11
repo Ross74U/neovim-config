@@ -1,6 +1,10 @@
 local M = {}
 local statusline = require("hotbuffers.statusline")
+
+--- @type table<number, string>
 M.hotkeys = { "1", "2", "3", "4", "5" } -- sensible default
+
+--- @type table<string, number>
 M.hotbufs = {}
 
 local function is_hotkeys(key)
@@ -18,6 +22,7 @@ end
 -- Add current buffer to next available slot
 --------------------------------------------------------------------
 function M.add_current()
+  ---@type number
   local current_bufnr = vim.api.nvim_get_current_buf()
 
   -- skip if already hot
@@ -47,6 +52,7 @@ function M.add_current_to(key)
     -- TODO: add additional hotkeys behavior here
   end
 
+  ---@type number
   local bufnr = vim.api.nvim_get_current_buf()
 
   -- remove duplicates
@@ -57,7 +63,6 @@ function M.add_current_to(key)
   end
 
   M.hotbufs[key] = bufnr
-  vim.notify(string.format("Set key %s → %s", key, shortname(bufnr)))
   statusline.refresh_statusline()
 end
 
@@ -66,6 +71,7 @@ function M.swap_current_with(target_key)
     return
   end
 
+  ---@type number
   local current_bufnr = vim.api.nvim_get_current_buf()
   local target_bufnr = M.hotbufs[target_key]
 
@@ -109,6 +115,7 @@ end
 --------------------------------------------------------------------
 function M.dehot_current()
   M.cleanup()
+  ---@type number
   local current_bufnr = vim.api.nvim_get_current_buf()
   for key, bufnr in pairs(M.hotbufs) do
     if current_bufnr == bufnr then

@@ -28,9 +28,8 @@ vim.keymap.set("n", "<C-l>", ":TmuxNavigateRight<CR>", { silent = true, desc = "
 
 -- Other useful mappings
 vim.keymap.set("n", "<Esc>", ":noh<CR>", { silent = true, desc = "Clear highlights" })
-vim.keymap.set('i', 'jk', '<Esc>', { noremap = true, silent = true })
-vim.keymap.set('n', '<M-j>', '10j', { noremap = true, silent = true })
-vim.keymap.set('n', '<M-k>', '10k', { noremap = true, silent = true })
+-- vim.keymap.set('n', '<M-j>', '5j', { noremap = true, silent = true })
+-- vim.keymap.set('n', '<M-k>', '5k', { noremap = true, silent = true })
 
 -- Open current buffer in vertical and horizontal split
 vim.keymap.set('n', '<leader>vv', ':vsplit<CR>', { noremap = true, silent = true })
