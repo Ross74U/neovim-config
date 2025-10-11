@@ -3,6 +3,7 @@ local M = {}
 -- cursors maps bufnrs to cursor positions in that bufnr
 ---@type table<number, CursorPos[]>
 M.cursor_positions = {}
+vim.fn.sign_define("SavedCursor", { text = "C", texthl = "WarningMsg" })
 
 ---@class CursorPos
 ---@field col number
@@ -53,11 +54,6 @@ local function delete_pos(pos_arr, pos)
   end
   return false -- nothing matched
 end
-
-
-vim.fn.sign_define("SavedCursor", { text = "C", texthl = "WarningMsg" })
-
-
 
 
 function M.toggle_current_cursor()
@@ -119,17 +115,20 @@ end
 function M.cursor_next()
   local bufnr = vim.api.nvim_get_current_buf()
   if M.cursor_positions[bufnr] == nil or #M.cursor_positions[bufnr] == 0 then return end
+  local positions = M.cursor_positions[bufnr]
+
+
   local win = vim.api.nvim_get_current_win()
   ---@type number
   local row, _ = unpack(vim.api.nvim_win_get_cursor(win))
   local next_pos = nil
-  for i = 1, #M.cursor_positions[bufnr], 1 do
-    local pos = M.cursor_positions[bufnr][i]
-    if pos.row > row then
-      next_pos = pos
+  for i = 1, #positions do
+    if positions[i].row > row then
+      next_pos = positions[i]
+      break
     end
   end
-  if not next_pos then next_pos = M.cursor_positions[bufnr][1] end
+  if not next_pos then next_pos = positions[1] end
   vim.api.nvim_win_set_cursor(0, { next_pos.row, next_pos.col })
 end
 
@@ -137,17 +136,19 @@ end
 function M.cursor_prev()
   local bufnr = vim.api.nvim_get_current_buf()
   if M.cursor_positions[bufnr] == nil or #M.cursor_positions[bufnr] == 0 then return end
+  local positions = M.cursor_positions[bufnr]
+
   local win = vim.api.nvim_get_current_win()
   ---@type number
   local row, _ = unpack(vim.api.nvim_win_get_cursor(win))
   local next_pos = nil
-  for i = #M.cursor_positions[bufnr], 1, -1 do
-    local pos = M.cursor_positions[bufnr][i]
-    if pos.row < row then
-      next_pos = pos
+  for i = #positions, 1, -1 do
+    if positions[i].row < row then
+      next_pos = positions[i]
+      break
     end
   end
-  if not next_pos then next_pos = M.cursor_positions[bufnr][#M.cursor_positions[bufnr]] end
+  if not next_pos then next_pos = positions[#positions] end
   vim.api.nvim_win_set_cursor(0, { next_pos.row, next_pos.col })
 end
 
@@ -157,6 +158,19 @@ function M.clear_cursors()
   local bufnr = vim.api.nvim_get_current_buf()
   M.cursor_positions[bufnr] = nil
   vim.fn.sign_unplace("SavedCursorGroup", { buffer = bufnr })
+end
+
+function M.redraw_buf_markers(bufnr)
+  if M.cursor_positions[bufnr] == nil then return end
+  vim.fn.sign_unplace("SavedCursorGroup", { buffer = bufnr })
+  for _, pos in pairs(M.cursor_positions[bufnr]) do
+    vim.fn.sign_place(pos.row,
+      "SavedCursorGroup",
+      "SavedCursor",
+      bufnr,
+      { lnum = pos.row, priority = 10 }
+    )
+  end
 end
 
 return M

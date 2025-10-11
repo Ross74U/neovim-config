@@ -21,14 +21,23 @@ function M.setup(hotkeys)
     end, { desc = "Assign current buffer to hot slot " .. key })
   end
 
+  local function cursor_next_and_center()
+    cursors.cursor_next()
+    vim.cmd("normal! zz")
+  end
+
+  local function cursor_prev_and_center()
+    cursors.cursor_prev()
+    vim.cmd("normal! zz")
+  end
 
   vim.fn.sign_define("SavedCursor", { text = "C", texthl = "CurSearch" })
   vim.keymap.set("n", "<M-h>a", hotbuffers.add_current, { desc = "Add current buffer to next free hot slot" })
   vim.keymap.set("n", "<M-x>", hotbuffers.dehot_current, { desc = "Dehot current buffer" })
   vim.keymap.set("n", "<leader>hx", hotbuffers.close_non_hot_buffers, { desc = "Close all non-hot buffers" })
   vim.keymap.set("n", "<M-l>", cursors.toggle_current_cursor, { desc = "Save cursor" })
-  vim.keymap.set("n", "<M-j>", cursors.cursor_next, { desc = "goto prev cursor" })
-  vim.keymap.set("n", "<M-k>", cursors.cursor_prev, { desc = "goto next cursor " })
+  vim.keymap.set("n", "<M-j>", cursor_next_and_center, { desc = "goto prev cursor" })
+  vim.keymap.set("n", "<M-k>", cursor_prev_and_center, { desc = "goto next cursor " })
   vim.keymap.set("n", "<leader>lx", cursors.clear_cursors, { desc = "Clear all saved cursors in current buffer" })
 
   vim.api.nvim_create_autocmd("BufWipeout", {
@@ -42,6 +51,12 @@ function M.setup(hotkeys)
       -- Automatically add the current buffer to hot buffers when opened
       if vim.api.nvim_buf_get_name(0) == "" then return end
       hotbuffers.add_current()
+    end,
+  })
+
+  vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "BufWritePost" }, {
+    callback = function(args)
+      cursors.redraw_buf_markers(args.buf)
     end,
   })
 
