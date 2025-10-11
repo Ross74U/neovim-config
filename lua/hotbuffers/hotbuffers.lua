@@ -1,23 +1,7 @@
 local M = {}
-M.hotkeys = { "1", "2", "3", "4", "5" }
+local statusline = require("hotbuffers.statusline")
+M.hotkeys = { "1", "2", "3", "4", "5" } -- sensible default
 M.hotbufs = {}
---------------------------------------------------------------------
--- Utilities
---------------------------------------------------------------------
-
-local function shortname(bufnr)
-  local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":t")
-  return (name == "" and "[No Name]") or name
-end
-
-local function cleanup()
-  for _, key in pairs(M.hotkeys) do
-    local bufnr = M.hotbufs[key]
-    if bufnr and (not vim.api.nvim_buf_is_valid(bufnr)) then
-      M.hotbufs[key] = nil
-    end
-  end
-end
 
 local function is_hotkeys(key)
   if type(key) ~= "string" then
@@ -51,7 +35,7 @@ function M.add_current()
     end
   end
 
-  M.refresh_statusline()
+  statusline.refresh_statusline()
 end
 
 --------------------------------------------------------------------
@@ -74,7 +58,7 @@ function M.add_current_to(key)
 
   M.hotbufs[key] = bufnr
   vim.notify(string.format("Set key %s → %s", key, shortname(bufnr)))
-  M.refresh_statusline()
+  statusline.refresh_statusline()
 end
 
 function M.swap_current_with(target_key)
@@ -98,7 +82,7 @@ function M.swap_current_with(target_key)
   end
   M.hotbufs[target_key] = current_bufnr
 
-  M.refresh_statusline()
+  statusline.refresh_statusline()
 end
 
 --------------------------------------------------------------------
@@ -109,7 +93,7 @@ function M.goto_hot(key)
   if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
     vim.api.nvim_set_current_buf(bufnr)
   end
-  M.refresh_statusline()
+  statusline.refresh_statusline()
 end
 
 --------------------------------------------------------------------
@@ -117,21 +101,21 @@ end
 --------------------------------------------------------------------
 function M.dehot(key)
   M.hotbufs[key] = nil
-  M.refresh_statusline()
+  statusline.refresh_statusline()
 end
 
 --------------------------------------------------------------------
 -- Dehot Current Buffer
 --------------------------------------------------------------------
 function M.dehot_current()
-  cleanup()
+  M.cleanup()
   local current_bufnr = vim.api.nvim_get_current_buf()
   for key, bufnr in pairs(M.hotbufs) do
     if current_bufnr == bufnr then
       M.hotbufs[key] = nil
     end
   end
-  M.refresh_statusline()
+  statusline.refresh_statusline()
 end
 
 --------------------------------------------------------------------
@@ -157,68 +141,16 @@ function M.close_non_hot_buffers()
   end
 
   vim.notify(string.format("Closed %d non-hot buffers", closed_count))
-  M.refresh_statusline()
+  statusline.refresh_statusline()
 end
 
---------------------------------------------------------------------
--- Statusline Display
---------------------------------------------------------------------
-function M.statusline()
-  cleanup()
-  local parts = {}
+function M.cleanup()
   for _, key in pairs(M.hotkeys) do
     local bufnr = M.hotbufs[key]
-    local hl = key and (bufnr == vim.api.nvim_get_current_buf()) and "%#PmenuSel#" or "%#StatusLine#"
-    if bufnr then
-      table.insert(parts, string.format("%s[%s:%s]", hl, key, shortname(bufnr)))
-    else
-      table.insert(parts, string.format("%s[ %s:— ]", hl, key))
+    if bufnr and (not vim.api.nvim_buf_is_valid(bufnr)) then
+      M.hotbufs[key] = nil
     end
   end
-  return table.concat(parts, "       ")
-end
-
-function M.refresh_statusline()
-  vim.o.statusline = "%!v:lua.require'hotbuffers'.statusline()"
-end
-
---------------------------------------------------------------------
--- Setup / Keymaps
---------------------------------------------------------------------
-function M.setup(hotkeys)
-  if hotkeys then
-    M.hotkeys = hotkeys
-  end
-
-  for _, key in pairs(M.hotkeys) do
-    vim.keymap.set("n", string.format("<M-%s>", key), function()
-      M.goto_hot(key)
-    end, { desc = "Go to hot buffer " .. key })
-
-    vim.keymap.set("n", string.format("<M-h>%s", key), function()
-      M.swap_current_with(key)
-    end, { desc = "Assign current buffer to hot slot " .. key })
-  end
-
-  vim.keymap.set("n", "<M-h>a", M.add_current, { desc = "Add current buffer to next free hot slot" })
-  vim.keymap.set("n", "<M-x>", M.dehot_current, { desc = "Dehot current buffer" })
-  vim.keymap.set("n", "<leader>hx", M.close_non_hot_buffers, { desc = "Close all non-hot buffers" })
-
-  vim.api.nvim_create_autocmd("BufWipeout", {
-    callback = function()
-      cleanup()
-    end
-  })
-
-  vim.api.nvim_create_autocmd("BufWinEnter", {
-    callback = function()
-      -- Automatically add the current buffer to hot buffers when opened
-      if vim.api.nvim_buf_get_name(0) == "" then return end
-      require("hotbuffers").add_current()
-    end,
-  })
-
-  M.refresh_statusline()
 end
 
 return M
