@@ -1,0 +1,15 @@
+{
+  "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },
+  "cmp-nvim-lsp": { "branch": "main", "commit": "99290b3ec1322070bcfb9e846450a46f6efa50f0" },
+  "lazy.nvim": { "branch": "main", "commit": "85c7ff3711b730b4030d03144f6db6375044ae82" },
+  "nvim-autopairs": { "branch": "master", "commit": "68f0e5c3dab23261a945272032ee6700af86227a" },
+  "nvim-cmp": { "branch": "main", "commit": "c27370703e798666486e3064b64d59eaf4bdc6d5" },
+  "nvim-lspconfig": { "branch": "master", "commit": "effe4bf2e1afb881ea67291c648b68dd3dfc927a" },
+  "nvim-tree.lua": { "branch": "master", "commit": "c09ff35de503a41fa62465c6b4ae72d96e7a7ce4" },
+  "nvim-treesitter": { "branch": "master", "commit": "38959800c2439c890e3238af559f0dc3be45e393" },
+  "nvim-web-devicons": { "branch": "master", "commit": "ab4cfee554e501f497bce0856788d43cf2eb93d7" },
+  "plenary.nvim": { "branch": "master", "commit": "857c5ac632080dba10aae49dba902ce3abf91b35" },
+  "telescope-fzf-native.nvim": { "branch": "main", "commit": "2a5ceff981501cff8f46871d5402cd3378a8ab6a" },
+  "telescope.nvim": { "branch": "master", "commit": "814f102cd1da3dc78c7d2f20f2ef3ed3cdf0e6e4" },
+  "vim-tmux-navigator": { "branch": "master", "commit": "791dacfcfc8ccb7f6eb1c853050883b03e5a22fe" }
+}
